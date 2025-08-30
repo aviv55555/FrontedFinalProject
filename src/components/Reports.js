@@ -8,25 +8,34 @@ import BarChart from "./Charts/BarChart";
 import { openCostsDB } from "../lib/idb.module";
 
 function Reports() {
+  // State for filters (year, month, currency)
   const [filters, setFilters] = useState({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     currency: "USD"
   });
 
-  const [monthlyReport, setMonthlyReport] = useState(null); 
-  const [yearlyReport, setYearlyReport] = useState(null);   
+  // State for monthly and yearly reports
+  const [monthlyReport, setMonthlyReport] = useState(null);
+  const [yearlyReport, setYearlyReport] = useState(null);
+
+  // State for exchange rates and loading flags
   const [exchangeRates, setExchangeRates] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasData, setHasData] = useState(true);
 
   useEffect(() => {
+    // Load exchange rates from localStorage URL
     async function loadRates() {
       const url = localStorage.getItem("exchangeRatesUrl");
       if (!url) return;
       try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error("Failed to fetch rates");
+
+        if (response.status !== 200) {
+          throw new Error("FetchError: Invalid status code");
+        }
+
         const data = await response.json();
         setExchangeRates(data);
       } catch (error) {
@@ -37,6 +46,7 @@ function Reports() {
   }, []);
 
   useEffect(() => {
+    // Load both monthly and yearly reports
     async function loadReports() {
       if (!exchangeRates) return;
 
@@ -47,12 +57,14 @@ function Reports() {
       try {
         const db = await openCostsDB("costsdb", 1);
 
+        // Get monthly report for PieChart
         const monthData = await db.getReport(
           filters.year,
           filters.month,
           filters.currency,
           exchangeRates
         );
+
         if (!monthData || !monthData.costs || monthData.costs.length === 0) {
           setHasData(false);
         } else {
@@ -60,6 +72,7 @@ function Reports() {
           setMonthlyReport(monthData);
         }
 
+        // Get yearly report for BarChart
         const yearData = await db.getYearlyReport(
           filters.year,
           filters.currency,
@@ -78,6 +91,7 @@ function Reports() {
     loadReports();
   }, [filters, exchangeRates]);
 
+  // Update filters when user changes year/month/currency
   const handleChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
@@ -89,6 +103,8 @@ function Reports() {
           <Typography variant="h4" gutterBottom color="#00809D">
             Monthly Reports
           </Typography>
+
+          {/* Filter controls */}
           <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
             <TextField
               label="Year"
@@ -122,6 +138,7 @@ function Reports() {
         </CardContent>
       </Card>
 
+      {/* Display logic for reports */}
       {!exchangeRates ? (
         <Alert severity="info">
           Loading exchange rates... Please set the URL in Settings.

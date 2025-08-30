@@ -11,14 +11,17 @@ import {
   Legend
 } from "chart.js";
 
+// Register required chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function BarChart({ report }) {
+  // Array of month labels for the x-axis
   const months = [
     "Jan","Feb","Mar","Apr","May","Jun",
     "Jul","Aug","Sep","Oct","Nov","Dec"
   ];
 
+  // Data object for chart.js Bar chart
   const data = {
     labels: months,
     datasets: [
@@ -30,13 +33,14 @@ function BarChart({ report }) {
     ]
   };
 
+  // Options for chart.js configuration
   const options = {
     responsive: true,
     plugins: {
       legend: { position: "top" }
     },
     scales: {
-      y: { beginAtZero: true }
+      y: { beginAtZero: true } 
     }
   };
 
@@ -45,6 +49,7 @@ function BarChart({ report }) {
       <CardContent sx={{ height: "100%" }}>
         <Typography variant="h6">Bar Chart – Costs by Month</Typography>
         <Box sx={{ width: "750px", height: "400px" }}>
+          {/* Render bar chart with data and options */}
           <Bar data={data} options={options} />
         </Box>
       </CardContent>
@@ -52,4 +57,4 @@ function BarChart({ report }) {
   );
 }
 
-export default BarChart;
+export default BarChart;
