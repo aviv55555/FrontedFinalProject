@@ -38,7 +38,7 @@ function AddCostForm() {
   return (
     <Card sx={{ maxWidth: 500, margin: "auto" }}>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h5" gutterBottom color="#00809D">
           Add New Cost
         </Typography>
         <Box
@@ -85,7 +85,8 @@ function AddCostForm() {
             required
           />
 
-          <Button type="submit" variant="contained">
+          <Button type="submit" variant="contained" sx={{ backgroundColor: "#00809D", color: "white" }}
+>
             Add Cost
           </Button>
         </Box>
