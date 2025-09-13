@@ -29,34 +29,30 @@ export function openCostsDB(databaseName, databaseVersion) {
          */
         addCost: (cost) => {
           return new Promise((resolve, reject) => {
-            // Validation: check if 'sum' is a number and not negative
+            // Validation: sum must be a positive number
             if (typeof cost.sum !== "number" || cost.sum <= 0) {
               return reject(new Error("Sum must be a positive number"));
             }
 
-            // Open a transaction on the "costs" store with read/write permission
             const tx = db.transaction(["costs"], "readwrite");
             const store = tx.objectStore("costs");
 
-            // Save cost with current date in DB
             const costWithDate = {
               ...cost,
               date: new Date().toISOString()
             };
 
-            // Add the new cost object to the store
             const req = store.add(costWithDate);
 
             req.onsuccess = () => {
-              // Return only the original fields (without date) after successful insert
               const { sum, currency, category, description } = cost;
               resolve({ sum, currency, category, description });
             };
 
-            // Reject on error adding to the store
             req.onerror = () => reject(req.error);
           });
         },
+
         /**
          * Get all costs
          */
@@ -65,6 +61,7 @@ export function openCostsDB(databaseName, databaseVersion) {
             const tx = db.transaction(["costs"], "readonly");
             const store = tx.objectStore("costs");
             const req = store.getAll();
+
             req.onsuccess = () => resolve(req.result);
             req.onerror = () => reject(req.error);
           });
@@ -78,6 +75,7 @@ export function openCostsDB(databaseName, databaseVersion) {
             const tx = db.transaction(["costs"], "readwrite");
             const store = tx.objectStore("costs");
             const req = store.delete(id);
+
             req.onsuccess = () => resolve();
             req.onerror = () => reject(req.error);
           });
@@ -91,6 +89,7 @@ export function openCostsDB(databaseName, databaseVersion) {
             const tx = db.transaction(["costs"], "readwrite");
             const store = tx.objectStore("costs");
             const req = store.put(cost);
+
             req.onsuccess = () => resolve();
             req.onerror = () => reject(req.error);
           });
@@ -110,7 +109,7 @@ export function openCostsDB(databaseName, databaseVersion) {
               const y = Number(year);
               const m = Number(month);
 
-              const filtered = allCosts.filter(item => {
+              const filtered = allCosts.filter((item) => {
                 const d = new Date(item.date);
                 return d.getFullYear() === y && (d.getMonth() + 1) === m;
               });
@@ -124,7 +123,6 @@ export function openCostsDB(databaseName, databaseVersion) {
 
         /**
          * Get report for specific year + month
-         * Returns report in required structure
          */
         getReport: (year, month, currency, rates) => {
           return new Promise((resolve, reject) => {
@@ -134,12 +132,10 @@ export function openCostsDB(databaseName, databaseVersion) {
 
             req.onsuccess = () => {
               const allCosts = req.result;
-
               const y = Number(year);
               const m = Number(month);
 
-              // filter only costs of this year + month
-              const filtered = allCosts.filter(item => {
+              const filtered = allCosts.filter((item) => {
                 const d = new Date(item.date);
                 return d.getFullYear() === y && (d.getMonth() + 1) === m;
               });
@@ -147,11 +143,9 @@ export function openCostsDB(databaseName, databaseVersion) {
               const targetRate = rates?.[currency] || 1;
 
               let total = 0;
-              const costs = filtered.map(item => {
+              const costs = filtered.map((item) => {
                 const d = new Date(item.date);
                 const sourceRate = rates?.[item.currency] || 1;
-
-                // convert sum for total calculation
                 const convertedSum = item.sum * (targetRate / sourceRate);
                 total += convertedSum;
 
@@ -160,7 +154,7 @@ export function openCostsDB(databaseName, databaseVersion) {
                   currency: item.currency,
                   category: item.category,
                   description: item.description,
-                  Date: { day: d.getDate() }
+                  date: { day: d.getDate() }
                 };
               });
 
@@ -190,11 +184,11 @@ export function openCostsDB(databaseName, databaseVersion) {
             req.onsuccess = () => {
               const allCosts = req.result;
               const y = Number(year);
-
               const targetRate = rates?.[currency] || 1;
-              const monthlyTotals = new Array(12).fill(0);
 
-              allCosts.forEach(item => {
+              const monthlyTotals = Array.from({ length: 12 }, () => 0);
+
+              allCosts.forEach((item) => {
                 const d = new Date(item.date);
                 if (d.getFullYear() === y) {
                   const sourceRate = rates?.[item.currency] || 1;
@@ -202,7 +196,7 @@ export function openCostsDB(databaseName, databaseVersion) {
                   monthlyTotals[d.getMonth()] += convertedSum;
                 }
               });
-              
+
               resolve({
                 year: y,
                 currency,

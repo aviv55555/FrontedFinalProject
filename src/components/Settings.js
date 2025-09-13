@@ -27,8 +27,9 @@ function Settings() {
     try {
       const response = await fetch(url);
 
-      if (response.status !== 200) {
-        throw new Error("FetchError: Invalid status code");
+      // Validate response status
+      if (!response.ok) {
+        throw new Error(`FetchError: Invalid status code ${response.status}`);
       }
 
       const data = await response.json();
@@ -61,10 +62,18 @@ function Settings() {
           />
 
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: "#00809D", color: "white" }}>
+            <Button
+              variant="contained"
+              onClick={handleSave}
+              sx={{ backgroundColor: "#00809D", color: "white" }}
+            >
               Save
             </Button>
-            <Button variant="outlined" onClick={handleTest} sx={{ borderStyle: "#00809D", color: "#00809D" }}>
+            <Button
+              variant="outlined"
+              onClick={handleTest}
+              sx={{ borderColor: "#00809D", color: "#00809D" }}
+            >
               Test URL
             </Button>
           </Box>

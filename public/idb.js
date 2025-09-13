@@ -10,9 +10,12 @@ async function loadRates() {
     }
     try {
         const response = await fetch(url);
-        if (response.status !== 200) {
-            throw new Error("FetchError: Invalid status code");
+
+        // Validate response status
+        if (!response.ok) {
+            throw new Error(`FetchError: Invalid status code ${response.status}`);
         }
+
         const data = await response.json();
         return data;
     } catch (err) {
@@ -154,7 +157,7 @@ const idb = {
                                 const targetRate = rates[currency] || 1;
 
                                 // Initialize totals for 12 months
-                                const monthlyTotals = new Array(12).fill(0);
+                                const monthlyTotals = Array.from({ length: 12 }, () => 0);
 
                                 // Accumulate totals per month
                                 allCosts.forEach(item => {

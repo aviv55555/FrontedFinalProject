@@ -16,42 +16,52 @@ import currencySymbols from "../../lib/utils";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function BarChart({ report }) {
-  // Array of month labels for the x-axis
   const months = [
     "Jan","Feb","Mar","Apr","May","Jun",
     "Jul","Aug","Sep","Oct","Nov","Dec"
   ];
+  
+  const monthlyTotals = Array.isArray(report.monthlyTotals)
+    ? report.monthlyTotals
+    : Array.from({ length: 12 }, () => 0);
 
-  // Data object for chart.js Bar chart
   const data = {
     labels: months,
     datasets: [
       {
-        label: `Year ${report.year} in ${report.currency} (${currencySymbols[report.currency] || ""})`,
-        data: report.monthlyTotals,
+        label: `Year ${report.year} in ${report.currency} (${currencySymbols[report.currency] || ""})`,
+        data: monthlyTotals,
         backgroundColor: "#00809D"
       }
     ]
   };
 
-  // Options for chart.js configuration
   const options = {
     responsive: true,
     plugins: {
       legend: { position: "top" }
     },
     scales: {
-      y: { beginAtZero: true } 
+      y: { beginAtZero: true }
     }
   };
+  // Check if there's any non-zero value in monthlyTotals
+  const hasData = monthlyTotals.some((v) => v > 0);
 
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent sx={{ height: "100%" }}>
-        <Typography variant="h6" sx={{ color: "#00809D"}}>Bar Chart – Costs by Month</Typography>
+        <Typography variant="h6" sx={{ color: "#00809D" }}>
+          Bar Chart – Costs by Month
+        </Typography>
         <Box sx={{ width: "750px", height: "400px" }}>
-          {/* Render bar chart with data and options */}
-          <Bar data={data} options={options} />
+          {hasData ? (
+            <Bar data={data} options={options} />
+          ) : (
+            <Typography variant="body2" color="red" sx={{ mt: 2 }}>
+              No data available to display
+            </Typography>
+          )}
         </Box>
       </CardContent>
     </Card>

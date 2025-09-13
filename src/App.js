@@ -2,12 +2,12 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { CssBaseline, Container, GlobalStyles } from "@mui/material";
-import Navbar from "./components/Navbar";
-import AddCostForm from "./components/AddCostForm";
-import MonthlyReport from "./components/MonthlyReport";
-import YearlyReport from "./components/YearlyReport";
-import Settings from "./components/Settings";
-import CostsManagement from "./components/CostsManagement";
+import Navbar from "./components/navbar";
+import AddCostForm from "./components/add_cost_form";
+import MonthlyReport from "./components/monthly_report";
+import YearlyReport from "./components/yearly_report";
+import Settings from "./components/settings";
+import CostsManagement from "./components/costs_management";
 
 let theme = createTheme({
   palette: {

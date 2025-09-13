@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, Typography, Box, TextField, MenuItem } from "@mui/material";
 import { openCostsDB } from "../lib/idb.module";
-import PieChart from "./Charts/PieChart";
+import BarChart from "./charts/bar_chart";
 import currencySymbols from "../lib/utils";
 
-function MonthlyReport() {
+function YearlyReport() {
   const [filters, setFilters] = useState({
     year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1,
     currency: "USD"
   });
   const [report, setReport] = useState(null);
@@ -16,14 +15,24 @@ function MonthlyReport() {
   useEffect(() => {
     const url = localStorage.getItem("exchangeRatesUrl");
     if (!url) return;
-    fetch(url).then(res => res.json()).then(setRates);
+
+    // Fetch exchange rates with validation
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch exchange rates");
+        return res.json();
+      })
+      .then(setRates)
+      .catch((err) => console.error(err));
   }, []);
 
   useEffect(() => {
     if (!rates) return;
+
+    // Load yearly report from IndexedDB
     async function loadReport() {
       const db = await openCostsDB("costsdb", 1);
-      const r = await db.getReport(filters.year, filters.month, filters.currency, rates);
+      const r = await db.getYearlyReport(filters.year, filters.currency, rates);
       setReport(r);
     }
     loadReport();
@@ -33,21 +42,18 @@ function MonthlyReport() {
     <Card sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <CardContent>
         <Typography variant="h4" gutterBottom sx={{ color: "#00809D" }}>
-          Monthly Report
+          Yearly Report
         </Typography>
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          {/* Input field for year filter */}
           <TextField
             label="Year"
             type="number"
             value={filters.year}
             onChange={(e) => setFilters({ ...filters, year: Number(e.target.value) })}
           />
-          <TextField
-            label="Month"
-            type="number"
-            value={filters.month}
-            onChange={(e) => setFilters({ ...filters, month: Number(e.target.value) })}
-          />
+
+          {/* Dropdown for currency filter */}
           <TextField
             select
             label="Currency"
@@ -62,10 +68,18 @@ function MonthlyReport() {
             ))}
           </TextField>
         </Box>
-        {report && <PieChart report={report} rates={rates} />}
+
+        {/* Show chart if report exists, otherwise show fallback message */}
+        {!report ? (
+          <Typography variant="body2" color="textSecondary">
+            No data available to display
+          </Typography>
+        ) : (
+          <BarChart report={report} />
+        )}
       </CardContent>
     </Card>
   );
 }
 
-export default MonthlyReport;
+export default YearlyReport;

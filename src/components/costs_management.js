@@ -25,25 +25,33 @@ function CostsManagement() {
     description: ""
   });
 
-  // Load all costs from DB
+  // Load all costs from IndexedDB
   const loadCosts = async () => {
-    const db = await openCostsDB("costsdb", 1);
-    const all = await db.getAllCosts();
-    setCosts(all);
+    try {
+      const db = await openCostsDB("costsdb", 1);
+      const all = await db.getAllCosts();
+      setCosts(all);
+    } catch (err) {
+      console.error("Failed to load costs", err);
+    }
   };
 
   useEffect(() => {
     loadCosts();
   }, []);
 
-  // Delete cost
+  // Delete cost by id
   const handleDelete = async (id) => {
-    const db = await openCostsDB("costsdb", 1);
-    await db.deleteCost(id);
-    loadCosts();
+    try {
+      const db = await openCostsDB("costsdb", 1);
+      await db.deleteCost(id);
+      loadCosts();
+    } catch (err) {
+      console.error("Failed to delete cost", err);
+    }
   };
 
-  // Start editing
+  // Start editing a cost
   const handleEditStart = (cost) => {
     setEditingId(cost.id);
     setEditForm({
@@ -54,20 +62,29 @@ function CostsManagement() {
     });
   };
 
-  // Save edited cost
+  // Save edited cost with validation
   const handleEditSave = async () => {
-    const db = await openCostsDB("costsdb", 1);
-    const original = costs.find((c) => c.id === editingId);
+    if (editForm.sum <= 0) {
+      alert("Sum must be a positive number");
+      return;
+    }
 
-    await db.updateCost({
-      id: editingId,
-      ...editForm,
-      date: original.date // keep original date
-    });
+    try {
+      const db = await openCostsDB("costsdb", 1);
+      const original = costs.find((c) => c.id === editingId);
 
-    setEditingId(null);
-    setEditForm({ sum: "", currency: "USD", category: "", description: "" });
-    loadCosts();
+      await db.updateCost({
+        id: editingId,
+        ...editForm,
+        date: original.date // keep original date
+      });
+
+      setEditingId(null);
+      setEditForm({ sum: "", currency: "USD", category: "", description: "" });
+      loadCosts();
+    } catch (err) {
+      console.error("Failed to update cost", err);
+    }
   };
 
   // Filter costs by search + year + month
@@ -117,7 +134,7 @@ function CostsManagement() {
         {/* Table or message */}
         {filteredCosts.length === 0 ? (
           <Typography variant="body1" color="error">
-            No expenses found for this {month ? "month" : "year"}.
+            No matching expenses found.
           </Typography>
         ) : (
           <Table>

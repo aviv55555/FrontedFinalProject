@@ -24,8 +24,9 @@ function AddCostForm() {
       try {
         const response = await fetch(url);
 
-        if (response.status !== 200) {
-          throw new Error("FetchError: Invalid status code");
+        // Validate response status
+        if (!response.ok) {
+          throw new Error(`FetchError: Invalid status code ${response.status}`);
         }
 
         const data = await response.json();
@@ -48,6 +49,12 @@ function AddCostForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate sum before saving
+    if (form.sum <= 0) {
+      alert("Sum must be a positive number");
+      return;
+    }
+
     try {
       const db = await openCostsDB("costsdb", 1);
 
@@ -61,6 +68,7 @@ function AddCostForm() {
 
       alert("Cost added successfully!");
 
+      // Reset form fields
       setForm({ sum: "", currency: "USD", category: "", description: "" });
     } catch (error) {
       console.error("AddCostError:", error);

@@ -15,7 +15,7 @@ function PieChart({ report, rates }) {
   const targetRate = rates?.[targetCurrency] || 1;
 
   // Iterate over all costs and convert values to the target currency
-  report.costs.forEach(c => {
+  report.costs.forEach((c) => {
     const sourceRate = rates?.[c.currency] || 1;
     const convertedSum = c.sum * (targetRate / sourceRate);
 
@@ -25,13 +25,17 @@ function PieChart({ report, rates }) {
 
   // Data structure for chart.js Pie chart
   const data = {
-    labels: Object.keys(categories), 
+    labels: Object.keys(categories),
     datasets: [
       {
-        label: `Costs in ${targetCurrency} (${currencySymbols[targetCurrency] || ""})`,
-        data: Object.values(categories), 
+        label: `Costs in ${targetCurrency} (${currencySymbols[targetCurrency] || ""})`,
+        data: Object.values(categories),
         backgroundColor: [
-          "#42a5f5", "#66bb6a", "#ffca28", "#ef5350", "#ab47bc"
+          "#42a5f5",
+          "#66bb6a",
+          "#ffca28",
+          "#ef5350",
+          "#ab47bc"
         ],
         borderWidth: 1
       }
@@ -41,9 +45,17 @@ function PieChart({ report, rates }) {
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent sx={{ height: "100%" }}>
-        <Typography variant="h6" sx={{ color: "#00809D"}}>Pie Chart – Costs by Category</Typography>
+        <Typography variant="h6" sx={{ color: "#00809D" }}>
+          Pie Chart – Costs by Category
+        </Typography>
         <Box sx={{ height: "400px", width: "100%" }}>
-          <Pie data={data} />
+          {data.labels.length > 0 ? (
+            <Pie data={data} />
+          ) : (
+            <Typography variant="body2" color="red" sx={{ mt: 2 }}>
+              No data available to display
+            </Typography>
+          )}
         </Box>
       </CardContent>
     </Card>
