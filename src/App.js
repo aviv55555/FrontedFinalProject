@@ -4,14 +4,16 @@ import { ThemeProvider, createTheme, responsiveFontSizes } from "@mui/material/s
 import { CssBaseline, Container, GlobalStyles } from "@mui/material";
 import Navbar from "./components/Navbar";
 import AddCostForm from "./components/AddCostForm";
-import Reports from "./components/Reports";
+import MonthlyReport from "./components/MonthlyReport";
+import YearlyReport from "./components/YearlyReport";
 import Settings from "./components/Settings";
+import CostsManagement from "./components/CostsManagement";
 
 let theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1976d2",
+      main: "#00809D",
     },
     background: {
       default: "#f5f5f5",
@@ -71,7 +73,9 @@ function App() {
         <Container sx={{ py: 4 }}>
           <Routes>
             <Route path="/" element={<AddCostForm />} />
-            <Route path="/reports" element={<Reports />} />
+            <Route path="/costsManagement" element={<CostsManagement />} />
+            <Route path="/monthlyReports" element={<MonthlyReport />} />
+            <Route path="/yearlyReports" element={<YearlyReport />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Container>

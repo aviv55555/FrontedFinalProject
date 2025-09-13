@@ -1,57 +1,18 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
-<head>
-
-   <meta charset="UTF-8">
-
-   <title>Title</title>
-
-</head>
-
-<body>
-     <div id="root"></div>
-   <script src="idb.js"></script>
-
-   <script>
-
-     async function test() {
-
-       const db = await idb.openCostsDB("costsdb",1);
-
-       const result1 =
-                await db.addCost({sum:200, curency:"USD", category:"FOOD",
-                        description:"pizza"});
-
-       const result2 =
-                await db.addCost({sum:400, currency: "USD", category:"CAR",
-                        description:"fuel"});
-
-       if(db) {
-
-         console.log("creating db succeeded");
-
-       }
-
-       if(result1) {
-
-         console.log("adding 1st cost item succeeded");
-
-       }
-
-       if(result2) {
-
-         console.log("adding 2nd cost item succeeded");
-
-       }
-
-     }
-
-     test()
-      
-   </script>
-
-</body>
-
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="React App"
+    />
+    <title>My React App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
 </html>

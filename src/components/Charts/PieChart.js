@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import currencySymbols from "../../lib/utils";
 
 // Register required chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -27,7 +28,7 @@ function PieChart({ report, rates }) {
     labels: Object.keys(categories), 
     datasets: [
       {
-        label: `Costs in ${targetCurrency}`,
+        label: `Costs in ${targetCurrency} (${currencySymbols[targetCurrency] || ""})`,
         data: Object.values(categories), 
         backgroundColor: [
           "#42a5f5", "#66bb6a", "#ffca28", "#ef5350", "#ab47bc"
@@ -40,7 +41,7 @@ function PieChart({ report, rates }) {
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent sx={{ height: "100%" }}>
-        <Typography variant="h6">Pie Chart – Costs by Category</Typography>
+        <Typography variant="h6" sx={{ color: "#00809D"}}>Pie Chart – Costs by Category</Typography>
         <Box sx={{ height: "400px", width: "100%" }}>
           <Pie data={data} />
         </Box>

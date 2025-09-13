@@ -29,21 +29,93 @@ export function openCostsDB(databaseName, databaseVersion) {
          */
         addCost: (cost) => {
           return new Promise((resolve, reject) => {
+            // Validation: check if 'sum' is a number and not negative
+            if (typeof cost.sum !== "number" || cost.sum <= 0) {
+              return reject(new Error("Sum must be a positive number"));
+            }
+
+            // Open a transaction on the "costs" store with read/write permission
             const tx = db.transaction(["costs"], "readwrite");
             const store = tx.objectStore("costs");
 
-            // save cost with date in DB
+            // Save cost with current date in DB
             const costWithDate = {
               ...cost,
               date: new Date().toISOString()
             };
 
+            // Add the new cost object to the store
             const req = store.add(costWithDate);
 
             req.onsuccess = () => {
-              // return only the original fields (without date)
+              // Return only the original fields (without date) after successful insert
               const { sum, currency, category, description } = cost;
               resolve({ sum, currency, category, description });
+            };
+
+            // Reject on error adding to the store
+            req.onerror = () => reject(req.error);
+          });
+        },
+        /**
+         * Get all costs
+         */
+        getAllCosts: () => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(["costs"], "readonly");
+            const store = tx.objectStore("costs");
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+          });
+        },
+
+        /**
+         * Delete cost by id
+         */
+        deleteCost: (id) => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(["costs"], "readwrite");
+            const store = tx.objectStore("costs");
+            const req = store.delete(id);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+          });
+        },
+
+        /**
+         * Update cost by id
+         */
+        updateCost: (cost) => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(["costs"], "readwrite");
+            const store = tx.objectStore("costs");
+            const req = store.put(cost);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+          });
+        },
+
+        /**
+         * Get costs by month + year
+         */
+        getCostsByMonth: (year, month) => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(["costs"], "readonly");
+            const store = tx.objectStore("costs");
+            const req = store.getAll();
+
+            req.onsuccess = () => {
+              const allCosts = req.result;
+              const y = Number(year);
+              const m = Number(month);
+
+              const filtered = allCosts.filter(item => {
+                const d = new Date(item.date);
+                return d.getFullYear() === y && (d.getMonth() + 1) === m;
+              });
+
+              resolve(filtered);
             };
 
             req.onerror = () => reject(req.error);

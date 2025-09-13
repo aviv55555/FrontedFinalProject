@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend
 } from "chart.js";
+import currencySymbols from "../../lib/utils";
 
 // Register required chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -26,7 +27,7 @@ function BarChart({ report }) {
     labels: months,
     datasets: [
       {
-        label: `Year ${report.year} in ${report.currency}`,
+        label: `Year ${report.year} in ${report.currency} (${currencySymbols[report.currency] || ""})`,
         data: report.monthlyTotals,
         backgroundColor: "#00809D"
       }
@@ -47,7 +48,7 @@ function BarChart({ report }) {
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent sx={{ height: "100%" }}>
-        <Typography variant="h6">Bar Chart – Costs by Month</Typography>
+        <Typography variant="h6" sx={{ color: "#00809D"}}>Bar Chart – Costs by Month</Typography>
         <Box sx={{ width: "750px", height: "400px" }}>
           {/* Render bar chart with data and options */}
           <Bar data={data} options={options} />

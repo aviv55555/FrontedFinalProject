@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, Typography, TextField, Button, MenuItem, Box } from "@mui/material";
 import { openCostsDB } from "../lib/idb.module"; 
+import currencySymbols from "../lib/utils";
 
 function AddCostForm() {
   // State object for form fields
@@ -97,7 +98,7 @@ function AddCostForm() {
           >
             {currencies.map((c) => (
               <MenuItem key={c} value={c}>
-                {c}
+                {c} {currencySymbols[c] ? `(${currencySymbols[c]})` : ""}
               </MenuItem>
             ))}
           </TextField>
